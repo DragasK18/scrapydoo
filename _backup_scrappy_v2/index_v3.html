@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0077B6" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>Scrappy Doo · Comparador de precios</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='css/app.css') }}" rel="stylesheet" />
+</head>
+<body>
+  <div class="app-shell">
+    <div id="sidebarBackdrop" class="sidebar-backdrop" aria-hidden="true"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="sidebar" aria-label="Menú principal">
+      <div class="brand">
+        <div class="brand-logo">SCRAPPY DOO</div>
+        <div class="brand-sub">Comparador de precios</div>
+        <button type="button" id="sidebarCloseBtn" class="sidebar-close" aria-label="Cerrar menú">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <nav class="nav-menu">
+        <a class="nav-link active" data-view="search"><i class="bi bi-search"></i> Consulta</a>
+        <a class="nav-link" data-view="catalogextract"><i class="bi bi-cloud-arrow-down"></i> Descargar catálogos</a>
+        <a class="nav-link" data-view="dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a class="nav-link" data-view="history"><i class="bi bi-clock-history"></i> Histórico</a>
+        <a class="nav-link" data-view="alerts"><i class="bi bi-bell"></i> Alertas</a>
+        <a class="nav-link" data-view="catalog"><i class="bi bi-database"></i> Catálogo Makro</a>
+        <a class="nav-link" data-view="bulk"><i class="bi bi-upload"></i> Carga masiva</a>
+      </nav>
+      <div class="sidebar-footer">
+        <span id="modeBadge" class="badge bg-secondary">—</span>
+        <div class="mt-2">Colombia · COP</div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <header class="mobile-topbar">
+        <button type="button" id="menuBtn" class="menu-btn" aria-label="Abrir menú" aria-controls="sidebar" aria-expanded="false">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="mobile-brand">
+          <span class="mobile-brand-logo">SCRAPPY DOO</span>
+          <span class="mobile-brand-sub">Precios</span>
+        </div>
+        <span id="mobileModeBadge" class="badge bg-success mobile-mode-badge">REAL</span>
+      </header>
+
+      <!-- ── VIEW: SEARCH ── -->
+      <section class="view" id="view-search">
+        <h1 class="page-title">Consulta de precios</h1>
+        <p class="page-sub">Compara precios en los principales retailers colombianos por EAN o por nombre del producto.</p>
+
+        <!-- Selector de método de búsqueda -->
+        <div class="search-tabs">
+          <button class="search-tab active" data-search="ean"><i class="bi bi-upc-scan"></i> Buscar por EAN</button>
+          <button class="search-tab" data-search="name"><i class="bi bi-fonts"></i> Buscar por nombre</button>
+        </div>
+
+        <!-- ── FORM A: por EAN ── -->
+        <div class="search-pane" id="pane-ean">
+          <div class="card filter-card">
+            <div class="card-body">
+              <div class="row g-3 align-items-end">
+                <div class="col-12 col-md-2">
+                  <label class="form-label">Categoría</label>
+                  <select id="categorySelect" class="form-select"></select>
+                </div>
+                <div class="col-12 col-md-3">
+                  <label class="form-label">EAN</label>
+                  <input id="eanInput" class="form-control" placeholder="7702..." inputmode="numeric" autocomplete="off" />
+                </div>
+                <div class="col-6 col-md-2">
+                  <label class="form-label">Costo Makro (COP)</label>
+                  <input id="costInput" type="number" class="form-control" placeholder="0" inputmode="decimal" />
+                </div>
+                <div class="col-6 col-md-2">
+                  <label class="form-label">Margen objetivo %</label>
+                  <input id="marginInput" type="number" class="form-control" placeholder="15" inputmode="decimal" />
+                </div>
+                <div class="col-12 col-md-3 d-grid">
+                  <button id="searchBtn" class="btn btn-primary"><i class="bi bi-search"></i> Buscar</button>
+                </div>
+              </div>
+              <div class="row g-3 align-items-end mt-1">
+                <div class="col-12 col-md-6">
+                  <label class="form-label">Descripción (homologación si el EAN no existe)</label>
+                  <input id="descInput" class="form-control" placeholder="Ej: Leche Alpina Entera 1100 ml" />
+                </div>
+                <div class="col-12 col-md-6">
+                  <label class="form-label">Tienda / ciudad</label>
+                  <select id="locationSelect" class="form-select">
+                    <option value="">Nacional (sin regionalizar)</option>
+                  </select>
+                </div>
+              </div>
+              <div id="eanHints" class="ean-hints mt-3"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── FORM B: por nombre ── -->
+        <div class="search-pane d-none" id="pane-name">
+          <div class="card filter-card">
+            <div class="card-body">
+              <p class="text-muted small mb-3">
+                <i class="bi bi-info-circle"></i>
+                ¿No tienes el EAN? Busca por nombre y homologamos en cada ecommerce.
+                Ideal para <strong>Fruver</strong> a granel. Indica peso para productos pesables
+                y selecciona tienda/ciudad para precios regionalizados (VTEX).
+              </p>
+              <div class="row g-3 align-items-end">
+                <div class="col-12 col-md-2">
+                  <label class="form-label">Categoría</label>
+                  <select id="nameCategorySelect" class="form-select"></select>
+                </div>
+                <div class="col-12 col-md-4">
+                  <label class="form-label">Nombre del producto</label>
+                  <input id="nameInput" class="form-control" placeholder="Ej: Pechuga de pollo, Arándanos" autocomplete="off" />
+                </div>
+                <div class="col-7 col-md-2">
+                  <label class="form-label">Peso / cantidad</label>
+                  <div class="input-group">
+                    <input id="nameWeightInput" type="number" class="form-control" placeholder="1" min="0" step="any" inputmode="decimal" />
+                    <select id="nameWeightUnit" class="form-select" style="max-width:72px">
+                      <option value="kg" selected>kg</option>
+                      <option value="g">g</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-5 col-md-2">
+                  <label class="form-label">Costo Makro (COP)</label>
+                  <input id="nameCostInput" type="number" class="form-control" placeholder="0" inputmode="decimal" />
+                  <div class="form-text">Para el peso indicado</div>
+                </div>
+                <div class="col-12 col-md-2 d-grid">
+                  <button id="searchNameBtn" class="btn btn-primary"><i class="bi bi-search"></i> Buscar</button>
+                </div>
+              </div>
+              <div class="row g-3 align-items-end mt-1">
+                <div class="col-6 col-md-3">
+                  <label class="form-label">Margen objetivo %</label>
+                  <input id="nameMarginInput" type="number" class="form-control" placeholder="15" inputmode="decimal" />
+                </div>
+                <div class="col-6 col-md-3">
+                  <label class="form-label">Tienda / ciudad</label>
+                  <select id="nameLocationSelect" class="form-select">
+                    <option value="">Nacional</option>
+                  </select>
+                </div>
+                <div class="col-12 col-md-6">
+                  <label class="form-label">Comparar varias ciudades <span class="text-muted">(opcional, separadas por coma)</span></label>
+                  <input id="nameMultiCityInput" class="form-control" placeholder="Ej: Bogotá, Medellín, Cali o 1, 5, 18" />
+                  <div class="form-text">Si se llena, ignora la tienda individual y compara en todas.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="searchResult"></div>
+      </section>
+
+      <!-- ── VIEW: DESCARGA DE CATÁLOGOS ── -->
+      <section class="view d-none" id="view-catalogextract">
+        <h1 class="page-title">Descarga de catálogos</h1>
+        <p class="page-sub">
+          Baja el catálogo completo de una farmacia (laboratorio, marca o categoría)
+          a Excel: precio, precio de lista, INVIMA, PUM, código de barras y stock.
+        </p>
+        <div class="card filter-card"><div class="card-body">
+          <div class="alert alert-info small">
+            <i class="bi bi-info-circle"></i>
+            Abre la farmacia en tu navegador, busca un laboratorio o marca y copia la
+            URL de resultados. Pégala aquí (una por línea). Soportadas:
+            <strong>Farmanorte, Tu Droguería Virtual, La Rebaja Virtual, Farmacias Pasteur,
+            Farmatodo y Cruz Verde</strong> (Droguería La Economía aún no verificada).
+          </div>
+          <label class="form-label">Enlaces de búsqueda (uno por línea)</label>
+          <textarea id="catalogLinks" class="form-control" rows="6" placeholder="https://www.tudrogueriavirtual.com/busqueda?q=acetaminofen"></textarea>
+          <div class="d-grid d-md-flex gap-2 mt-3">
+            <button id="catalogExtractBtn" class="btn btn-primary"><i class="bi bi-cloud-arrow-down"></i> Descargar catálogos</button>
+          </div>
+          <div id="catalogExtractResult" class="mt-3"></div>
+        </div></div>
+      </section>
+
+      <!-- ── VIEW: DASHBOARD ── -->
+      <section class="view d-none" id="view-dashboard">
+        <h1 class="page-title">Dashboard ejecutivo</h1>
+        <p class="page-sub">Indicadores consolidados de la operación de inteligencia de precios.</p>
+        <div id="dashboardKpis" class="kpi-grid"></div>
+        <div class="row g-3 mt-1">
+          <div class="col-lg-7">
+            <div class="card h-100"><div class="card-body">
+              <h6 class="card-title">Productos por categoría</h6>
+              <canvas id="categoryChart" height="140"></canvas>
+            </div></div>
+          </div>
+          <div class="col-lg-5">
+            <div class="card h-100"><div class="card-body">
+              <h6 class="card-title">Alertas recientes</h6>
+              <div id="dashboardAlerts" class="alert-list"></div>
+            </div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── VIEW: HISTORY ── -->
+      <section class="view d-none" id="view-history">
+        <h1 class="page-title">Histórico de consultas</h1>
+        <p class="page-sub">Trazabilidad de cada comparación realizada.</p>
+        <div class="card"><div class="card-body table-responsive">
+          <table class="table table-hover align-middle" id="historyTable">
+            <thead><tr>
+              <th>Fecha</th><th>Producto</th><th>EAN</th><th>Ciudad</th><th>Mín</th><th>Prom</th><th>Máx</th><th>Margen %</th><th></th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div></div>
+      </section>
+
+      <!-- ── VIEW: ALERTS ── -->
+      <section class="view d-none" id="view-alerts">
+        <h1 class="page-title">Alertas</h1>
+        <p class="page-sub">Precios bajo costo, fuera de mercado y variaciones superiores al 10%.</p>
+        <div id="alertsList" class="alert-list"></div>
+      </section>
+
+      <!-- ── VIEW: CATALOG ── -->
+      <section class="view d-none" id="view-catalog">
+        <h1 class="page-title">Catálogo Makro</h1>
+        <p class="page-sub">
+          Sube el Excel <strong>PRODUCTOS_MAKRO</strong> con columnas <code>Regular</code> (SKU Makro),
+          <code>Descripción</code> y <code>Ean</code> para que las búsquedas por código de barras
+          consulten tienda.makro.com.co correctamente. También puedes importar un archivo con
+          <code>EAN</code>, <code>Nombre</code> y <code>PVP</code> para comparar tu precio de lista.
+        </p>
+        <div class="card"><div class="card-body">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-8">
+              <label class="form-label">Archivo (.xlsx, .xls, .csv)</label>
+              <input id="catalogFile" type="file" accept=".xlsx,.xls,.csv" class="form-control" />
+              <div class="form-text">Columnas: <strong>Regular</strong> (SKU), <strong>Descripción</strong>, <strong>Ean</strong>. Opcional: <strong>PVP</strong>, Categoría, Costo, Marca.</div>
+            </div>
+            <div class="col-md-4 d-grid">
+              <button id="catalogBtn" class="btn btn-primary"><i class="bi bi-cloud-upload"></i> Importar catálogo</button>
+            </div>
+          </div>
+          <div id="catalogStats" class="mt-3"></div>
+          <div id="catalogResult" class="mt-3"></div>
+        </div></div>
+      </section>
+
+      <!-- ── VIEW: BULK ── -->
+      <section class="view d-none" id="view-bulk">
+        <h1 class="page-title">Carga masiva</h1>
+        <p class="page-sub">
+          Procesa cientos de productos desde un Excel. Puedes usar una sola columna
+          <code>Codigo_o_Nombre</code> (detecta automáticamente si es EAN o nombre del
+          producto), o columnas separadas <code>EAN</code> / <code>Descripcion</code>.
+          Columnas opcionales: <code>Costo</code>, <code>Categoria</code> (usar <code>fruver</code>),
+          <code>Ciudad</code> (código tienda o nombre), <code>Margen_Objetivo</code> (%).
+        </p>
+        <div class="mb-3">
+          <button id="bulkExampleBtn" type="button" class="btn btn-outline-primary btn-sm"><i class="bi bi-download"></i> Descargar archivo de ejemplo</button>
+        </div>
+        <div class="card"><div class="card-body">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-5">
+              <label class="form-label">Archivo Excel (.xlsx)</label>
+              <input id="bulkFile" type="file" accept=".xlsx,.xls" class="form-control" />
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Margen por defecto %</label>
+              <input id="bulkMargin" type="number" class="form-control" placeholder="15" />
+              <div class="form-text">Solo si la fila no trae margen</div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Ciudades / tiendas</label>
+              <input id="bulkCities" class="form-control" placeholder="Bogotá, Medellín o 1,5,18" />
+              <div class="form-text">Opcional si el Excel trae columna Ciudad</div>
+            </div>
+            <div class="col-md-2 d-grid">
+              <button id="bulkBtn" class="btn btn-primary"><i class="bi bi-upload"></i> Procesar</button>
+            </div>
+          </div>
+          <div id="bulkResult" class="mt-3"></div>
+        </div></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

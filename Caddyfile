@@ -1,0 +1,13 @@
+# Reemplaza "tusubdominio" por tu subdominio de DuckDNS.
+# Caddy obtiene el certificado HTTPS automáticamente (Let's Encrypt).
+#
+# Para ejecutarlo (una sola vez queda corriendo):
+#   1) Instala Caddy desde https://caddyserver.com/download
+#   2) Guarda este archivo como "Caddyfile" en la carpeta de Caddy
+#   3) Ejecuta:  caddy run --config Caddyfile
+#
+# Caddy escucha en los puertos 80 y 443 y reenvía a la app (localhost:5000).
+
+tusubdominio.duckdns.org {
+    reverse_proxy 127.0.0.1:5000
+}

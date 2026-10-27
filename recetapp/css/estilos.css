@@ -1,0 +1,906 @@
+/* RecetApp — primero para celular; se amplía con min-width. */
+
+:root {
+  --fondo: #f6f5f1;
+  --superficie: #ffffff;
+  --texto: #1d2321;
+  --texto-suave: #5b6562;
+  --borde: #dcdcd4;
+  --primario: #0077B6;
+  --primario-suave: #bfe3f5;
+  --barata: #13804a;
+  --barata-suave: #e5f5ea;
+  --coincide: #8a5a00;
+  --coincide-suave: #fbf0d9;
+  --aviso-fondo: #0077B6;
+  --aviso-texto: #ffffff;
+  --radio: 12px;
+  --alto-aviso: 4.25rem;
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Al desplazarse hasta un elemento (teclado, enlaces), que no quede bajo el buscador fijo ni bajo el aviso */
+html {
+  scroll-padding-top: 7.5rem;
+  scroll-padding-bottom: calc(var(--alto-aviso) + 1rem);
+}
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  padding-bottom: calc(var(--alto-aviso) + 1rem); /* que el aviso fijo no tape la última tarjeta */
+}
+
+/* Encabezado */
+.encabezado {
+  padding: 0.9rem 1rem 0.25rem;
+}
+
+.marca {
+  margin: 0;
+  font-size: 1.75rem;
+  letter-spacing: -0.02em;
+  color: var(--primario);
+}
+
+.marca span {
+  color: var(--texto);
+}
+
+.lema {
+  margin: 0.15rem 0 0;
+  color: var(--texto-suave);
+  font-size: 0.92rem;
+}
+
+.fecha-datos {
+  display: inline-block;
+  margin: 0.5rem 0 0;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: var(--primario-suave);
+  color: var(--primario);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Buscador: queda pegado arriba al hacer scroll */
+.buscador {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 0.6rem 1rem;
+  background: var(--fondo);
+  border-bottom: 1px solid var(--borde);
+}
+
+.buscador label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.buscador input {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.6rem 0.85rem;
+  border: 2px solid var(--borde);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+  font-size: 1.05rem; /* ≥ 16px: iOS no hace zoom al enfocar */
+}
+
+.buscador input:focus {
+  outline: none;
+  border-color: var(--primario);
+  box-shadow: 0 0 0 3px var(--primario-suave);
+}
+
+/* Contenido */
+main {
+  padding: 0.75rem 1rem 1rem;
+}
+
+.estado {
+  margin: 0.25rem 0 0.75rem;
+  color: var(--texto-suave);
+}
+
+.estado.error {
+  color: #b42318;
+  font-weight: 600;
+}
+
+.inicio p {
+  margin: 0 0 0.5rem;
+}
+
+.ejemplos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ejemplos button {
+  min-height: 2.75rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: var(--superficie);
+  color: var(--primario);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Grupos */
+.grupo {
+  margin: 0 0 1.75rem;
+}
+
+.grupo-titulo {
+  margin: 0;
+  font-size: 1.2rem;
+  letter-spacing: 0.01em;
+}
+
+.grupo-meta {
+  margin: 0.15rem 0 0.75rem;
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+}
+
+.tarjetas {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Tarjeta */
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  height: 100%;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: var(--superficie);
+}
+
+.tarjeta.mas-barata {
+  border: 2px solid var(--barata);
+  background: linear-gradient(var(--barata-suave), var(--superficie) 70%);
+}
+
+.etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.etiqueta {
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.etiqueta.barata {
+  background: var(--barata);
+  color: var(--superficie);
+}
+
+.etiqueta.coincide {
+  background: var(--coincide-suave);
+  color: var(--coincide);
+}
+
+.etiqueta.sin-unidad {
+  background: var(--fondo);
+  color: var(--texto-suave);
+  border: 1px solid var(--borde);
+}
+
+.farmacia {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.producto {
+  margin: 0;
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.datos {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.15rem 0.75rem;
+  margin: 0.25rem 0 0;
+  font-size: 0.92rem;
+}
+
+.datos dt {
+  color: var(--texto-suave);
+}
+
+.datos dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.precio-principal {
+  margin: 0.35rem 0 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.precio-principal small {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+  white-space: nowrap;
+}
+
+.mas-barata .precio-principal {
+  color: var(--barata);
+}
+
+.enlace {
+  margin-top: auto;
+  padding-top: 0.35rem;
+  color: var(--primario);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+}
+
+/* Aviso siempre visible */
+.aviso {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
+  min-height: var(--alto-aviso);
+  display: flex;
+  align-items: center;
+  padding: 0.6rem 1rem calc(0.6rem + env(safe-area-inset-bottom));
+  background: var(--aviso-fondo);
+  color: var(--aviso-texto);
+}
+
+.aviso p {
+  margin: 0 auto;
+  max-width: 60rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Pantallas más grandes */
+@media (min-width: 640px) {
+  .encabezado,
+  .buscador,
+  main {
+    padding-left: max(1.5rem, calc((100% - 60rem) / 2));
+    padding-right: max(1.5rem, calc((100% - 60rem) / 2));
+  }
+
+  .tarjetas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  :root {
+    --alto-aviso: 3rem;
+  }
+}
+
+@media (min-width: 960px) {
+  .tarjetas {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Tarjeta: se puede tocar para comparar */
+.tarjeta {
+  cursor: pointer;
+}
+
+.tarjeta.elegida {
+  outline: 3px solid var(--primario);
+  outline-offset: 2px;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 1rem;
+  margin-top: auto;
+  padding-top: 0.35rem;
+}
+
+.acciones .enlace {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.comparar {
+  min-height: 2.75rem;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--primario);
+  border-radius: 999px;
+  background: var(--primario-suave);
+  color: var(--primario);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Panel "Misma sustancia, más barato": hoja fija encima del aviso, que sigue visible */
+.panel {
+  position: fixed;
+  right: 0;
+  bottom: var(--alto-aviso);
+  left: 0;
+  z-index: 4;
+  max-height: min(70dvh, calc(100dvh - var(--alto-aviso) - 2.5rem)); /* que siga viéndose parte de la lista */
+  overflow-y: auto;
+  padding: 0.25rem 1rem 1rem;
+  border: 1px solid var(--borde);
+  border-bottom: 0;
+  border-radius: 18px 18px 0 0;
+  background: var(--superficie);
+  box-shadow: 0 -10px 30px rgb(0 0 0 / 0.2);
+}
+
+.panel[hidden] {
+  display: none;
+}
+
+.panel-cabecera {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 0 0.4rem;
+  background: var(--superficie);
+}
+
+.panel-cabecera h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--primario);
+}
+
+.panel-cabecera h2:focus {
+  outline: none;
+}
+
+.cerrar {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--fondo);
+  color: var(--texto);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.panel p {
+  margin: 0;
+}
+
+.panel-intro,
+.panel-ok {
+  margin-bottom: 0.6rem !important;
+}
+
+.panel-ok {
+  font-weight: 700;
+  color: var(--barata);
+}
+
+.resumen {
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+}
+
+.resumen.mejor {
+  border: 2px solid var(--barata);
+  background: var(--barata-suave);
+}
+
+.resumen-farmacia {
+  font-weight: 700;
+}
+
+.resumen-producto,
+.resumen-detalle {
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.resumen-precio {
+  margin: 0.2rem 0 !important;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.resumen.mejor .resumen-precio {
+  color: var(--barata);
+}
+
+.resumen-precio small {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+  white-space: nowrap;
+}
+
+.ahorro {
+  margin: 0.75rem 0 0.25rem;
+}
+
+.ahorro-titular strong {
+  font-size: 1.25rem;
+  color: var(--barata);
+}
+
+.ahorro-total {
+  margin-top: 0.25rem !important;
+}
+
+.panel-comparado,
+.panel-nota {
+  margin-top: 0.6rem !important;
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+}
+
+@media (min-width: 640px) {
+  .panel {
+    left: 50%;
+    right: auto;
+    width: min(36rem, 100% - 2rem);
+    transform: translateX(-50%);
+  }
+}
+
+/* Panel de Estadísticas (KPIs) */
+.kpi-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.kpi-caja {
+  flex: 1 1 auto;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 0.6rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.kpi-destacado {
+  background: var(--primario-suave);
+  border-color: var(--primario);
+}
+
+.kpi-destacado .kpi-valor {
+  color: var(--primario);
+}
+
+.kpi-etiqueta {
+  font-size: 0.75rem;
+  color: var(--texto-suave);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.kpi-valor {
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-top: 0.15rem;
+}
+
+/* --- NUEVO: Buscador en fila, Filtros Avanzados y Vista Lista --- */
+
+.buscador-fila {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.btn-secundario {
+  min-height: 3rem;
+  padding: 0 1rem;
+  border: 1px solid var(--primario);
+  border-radius: var(--radio);
+  background: var(--primario-suave);
+  color: var(--primario);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.filtros-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.6rem;
+  margin-top: 0.65rem;
+}
+
+@media (min-width: 640px) {
+  .filtros-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 960px) {
+  .filtros-grid {
+    grid-template-columns: 1.2fr 1.2fr 1fr auto;
+    align-items: end;
+  }
+}
+
+.filtro-campo label {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--texto-suave);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.filtro-campo select {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.filtro-campo select:focus {
+  outline: none;
+  border-color: var(--primario);
+}
+
+.filtro-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.check-equivalentes {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 !important;
+  font-size: 0.85rem !important;
+  text-transform: none !important;
+  color: var(--texto) !important;
+  cursor: pointer;
+}
+
+.check-equivalentes input {
+  width: 1.1rem;
+  height: 1.1rem;
+  min-height: 0;
+  margin: 0;
+  accent-color: var(--primario);
+}
+
+.vista-toggle {
+  display: inline-flex;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--superficie);
+}
+
+.btn-vista {
+  padding: 0.4rem 0.75rem;
+  border: 0;
+  background: transparent;
+  color: var(--texto-suave);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-vista.activo {
+  background: var(--primario-suave);
+  color: var(--primario);
+}
+
+/* Hacer las cajas de KPIs clicables */
+button.kpi-caja {
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease;
+}
+
+button.kpi-caja:hover {
+  border-color: var(--primario);
+  transform: translateY(-1px);
+}
+
+/* Etiquetas de descuento y precio tachado */
+.etiqueta.descuento {
+  background: var(--primario-suave);
+  color: var(--primario);
+}
+
+.precio-lista-tachado {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--texto-suave);
+  text-decoration: line-through;
+  margin-left: 0.35rem;
+}
+
+.tarjeta-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.grupo-cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--borde);
+}
+
+.grupo-meta {
+  margin: 0;
+}
+
+/* Vista en Lista Compacta (Horizontal en escritorio) */
+@media (min-width: 768px) {
+  .tarjetas.vista-lista {
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+  }
+
+  .tarjetas.vista-lista .tarjeta {
+    display: grid;
+    grid-template-columns: 11rem 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.65rem 1rem;
+  }
+
+  .tarjetas.vista-lista .tarjeta-cabecera {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .tarjetas.vista-lista .datos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin-top: 0.2rem;
+  }
+
+  .tarjetas.vista-lista .datos dt::after {
+    content: ":";
+  }
+
+  .tarjetas.vista-lista .tarjeta-precios {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3rem;
+  }
+
+  .tarjetas.vista-lista .precio-principal {
+    margin: 0;
+  }
+
+  .tarjetas.vista-lista .acciones {
+    margin-top: 0;
+    padding-top: 0;
+  }
+}
+
+.contenedor-mas {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+.btn-cargar-mas {
+  min-height: 2.85rem;
+  padding: 0.5rem 1.5rem;
+  border: 2px solid var(--primario);
+  border-radius: 999px;
+  background: var(--superficie);
+  color: var(--primario);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-cargar-mas:hover {
+  background: var(--primario-suave);
+}
+
+/* --- Carrito de Agrupación Consciente y Exportación --- */
+
+.tarjeta.en-carrito {
+  border: 2px solid var(--primario);
+  background: linear-gradient(var(--primario-suave), var(--superficie) 45%);
+}
+
+.btn-agrupar {
+  min-height: 2.75rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px dashed var(--primario);
+  border-radius: 999px;
+  background: var(--superficie);
+  color: var(--primario);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-agrupar:hover {
+  background: var(--primario-suave);
+}
+
+.btn-agrupar.activo {
+  border-style: solid;
+  background: var(--primario);
+  color: var(--superficie);
+}
+
+.grupo-cabecera-derecha {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btn-agrupar-grupo {
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: var(--superficie);
+  color: var(--primario);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-agrupar-grupo:hover {
+  border-color: var(--primario);
+  background: var(--primario-suave);
+}
+
+.barra-carrito {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--alto-aviso) + 0.75rem);
+  transform: translateX(-50%);
+  z-index: 5;
+  width: min(52rem, calc(100% - 1.5rem));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1.1rem;
+  background: #122634;
+  color: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgb(0 0 0 / 0.28);
+}
+
+.barra-carrito[hidden] {
+  display: none;
+}
+
+.carrito-info {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+}
+
+.carrito-info span {
+  font-size: 0.8rem;
+  color: #bfe3f5;
+}
+
+.carrito-acciones {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-carrito-vaciar {
+  min-height: 2.5rem;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid #486b85;
+  border-radius: 999px;
+  background: transparent;
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-carrito-exportar {
+  min-height: 2.5rem;
+  padding: 0.4rem 1.1rem;
+  border: 0;
+  border-radius: 999px;
+  background: #19a964;
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-carrito-exportar:hover {
+  background: #13804a;
+}

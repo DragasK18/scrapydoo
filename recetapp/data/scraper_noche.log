@@ -1,0 +1,70 @@
+
+=== Barriendo catálogo de La Rebaja (https://www.larebajavirtual.com) ===
+  Categorías descubiertas en VTEX: 185
+  [ANTOJOS (pág 1)] 50 vistos -> +50 guardados (Acumulado La Rebaja: 50)
+  [ANTOJOS (pág 2)] 50 vistos -> +50 guardados (Acumulado La Rebaja: 100)
+^C
+=== Barriendo catálogo de La Rebaja (https://www.larebajavirtual.com) ===
+  Categorías descubiertas en VTEX: 185
+Traceback (most recent call last):
+  File "D:\Proyectos\Comparador de precios\BUSQUEDA-EAN-main\recetapp\scraper.py", line 1731, in <module>
+    main()
+    ~~~~^^
+  File "D:\Proyectos\Comparador de precios\BUSQUEDA-EAN-main\recetapp\scraper.py", line 1694, in main
+    for descripcion_lote, lote_crudo in iterador(cliente, config, max_paginas=args.max_paginas):
+                                        ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Proyectos\Comparador de precios\BUSQUEDA-EAN-main\recetapp\scraper.py", line 501, in iterar_catalogo_vtex
+    texto, headers = cliente.pedir(url_consulta)
+                     ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "D:\Proyectos\Comparador de precios\BUSQUEDA-EAN-main\recetapp\scraper.py", line 408, in pedir
+    time.sleep(pausa_objetivo - transcurrido)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+^C
+=== Barriendo catálogo de La Rebaja (https://www.larebajavirtual.com) ===
+  Categorías descubiertas en VTEX: 185
+  [ANTOJOS (pág 1)] 50 vistos -> +50 guardados (Acumulado La Rebaja: 50)
+  [ANTOJOS (pág 2)] 50 vistos -> +50 guardados (Acumulado La Rebaja: 100)
+  [ANTOJOS (pág 3)] 50 vistos -> +50 guardados (Acumulado La Rebaja: 150)
+  [ANTOJOS (pág 4)] 50 vistos -> +39 guardados (Acumulado La Rebaja: 189)
+  [ANTOJOS (pág 5)] 50 vistos -> +0 guardados (Acumulado La Rebaja: 189)
+  [ANTOJOS (pág 6)] 50 vistos -> +0 guardados (Acumulado La Rebaja: 189)
+  [ANTOJOS (pág 7)] 50 vistos -> +0 guardados (Acumulado La Rebaja: 189)
+  [ANTOJOS (pág 8)] 50 vistos -> +0 guardados (Acumulado La Rebaja: 189)
+  [ANTOJOS (pág 9)] 50 vistos -> +0 guardados (Acumulado La Rebaja: 189)
+  [ANTOJOS (pág 10)] 24 vistos -> +0 guardados (Acumulado La Rebaja: 189)
+  [BEBIDAS (pág 1)] 50 vistos -> +50 guardados (Acumulado La Rebaja: 239)
+  [BEBIDAS (pág 2)] 50 vistos -> +50 guardados (Acumulado La Rebaja: 289)
+  [BEBIDAS (pág 3)] 50 vistos -> +50 guardados (Acumulado La Rebaja: 339)
+  [BEBIDAS (pág 4)] 50 vistos -> +12 guardados (Acumulado La Rebaja: 351)
+  [BEBIDAS (pág 5)] 50 vistos -> +0 guardados (Acumulado La Rebaja: 351)
+  [BEBIDAS (pág 6)] 50 vistos -> +0 guardados (Acumulado La Rebaja: 351)
+  [BEBIDAS (pág 7)] 50 vistos -> +0 guardados (Acumulado La Rebaja: 351)
+  [BEBIDAS (pág 8)] 50 vistos -> +0 guardados (Acumulado La Rebaja: 351)
+  [BEBIDAS (pág 9)] 39 vistos -> +0 guardados (Acumulado La Rebaja: 351)
+  [DESAYUNO (pág 1)] 50 vistos -> +50 guardados (Acumulado La Rebaja: 401)
+  [DESAYUNO (pág 2)] 50 vistos -> +14 guardados (Acumulado La Rebaja: 415)
+  [DESAYUNO (pág 3)] 50 vistos -> +0 guardados (Acumulado La Rebaja: 415)
+  [DESAYUNO (pág 4)] 13 vistos -> +0 guardados (Acumulado La Rebaja: 415)
+  [DESPENSA (pág 1)] 50 vistos -> +30 guardados (Acumulado La Rebaja: 445)
+  [DESPENSA (pág 2)] 27 vistos -> +0 guardados (Acumulado La Rebaja: 445)
+  [ENDULZANTES (pág 1)] 28 vistos -> +3 guardados (Acumulado La Rebaja: 448)
+  [LACTEOS Y REFRIGERADOS (pág 1)] 50 vistos -> +50 guardados (Acumulado La Rebaja: 498)
+  [LACTEOS Y REFRIGERADOS (pág 2)] 50 vistos -> +38 guardados (Acumulado La Rebaja: 536)
+  [LACTEOS Y REFRIGERADOS (pág 3)] 50 vistos -> +0 guardados (Acumulado La Rebaja: 536)
+  [LACTEOS Y REFRIGERADOS (pág 4)] 50 vistos -> +0 guardados (Acumulado La Rebaja: 536)
+  [LACTEOS Y REFRIGERADOS (pág 5)] 50 vistos -> +0 guardados (Acumulado La Rebaja: 536)
+  [LACTEOS Y REFRIGERADOS (pág 6)] 50 vistos -> +0 guardados (Acumulado La Rebaja: 536)
+  [LACTEOS Y REFRIGERADOS (pág 7)] 16 vistos -> +0 guardados (Acumulado La Rebaja: 536)
+  [MUNDO SALUDABLE (pág 1)] 48 vistos -> +13 guardados (Acumulado La Rebaja: 549)
+  [FRUTOS SECOS (pág 1)] 50 vistos -> +44 guardados (Acumulado La Rebaja: 593)
+  [FRUTOS SECOS (pág 2)] 4 vistos -> +0 guardados (Acumulado La Rebaja: 593)
+  [GALLETAS (pág 1)] 50 vistos -> +38 guardados (Acumulado La Rebaja: 631)
+  [GALLETAS (pág 2)] 11 vistos -> +0 guardados (Acumulado La Rebaja: 631)
+  [NUTRICION (pág 1)] 50 vistos -> +50 guardados (Acumulado La Rebaja: 681)
+  [NUTRICION (pág 2)] 50 vistos -> +21 guardados (Acumulado La Rebaja: 702)
+  [NUTRICION (pág 3)] 7 vistos -> +0 guardados (Acumulado La Rebaja: 702)
+  [ACCESORIOS MATERNIDAD Y BEBES (pág 1)] 50 vistos -> +20 guardados (Acumulado La Rebaja: 722)
+  [ACCESORIOS MATERNIDAD Y BEBES (pág 2)] 8 vistos -> +0 guardados (Acumulado La Rebaja: 722)
+  [BAÑO DEL BEBE (pág 1)] 49 vistos -> +39 guardados (Acumulado La Rebaja: 761)
+  [DESPUES DEL BAÑO (pág 1)] 37 vistos -> +32 guardados (Acumulado La Rebaja: 793)

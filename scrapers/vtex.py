@@ -1,0 +1,210 @@
+"""
+Scraper para retailers sobre plataforma VTEX.
+
+La mayoría de los grandes retailers colombianos (Éxito, Carulla, Jumbo, Metro,
+Makro, Olímpica, Farmatodo) usan VTEX, que expone una API pública de catálogo
+en JSON. Esto permite scraping rápido y confiable sin renderizar el navegador.
+
+Endpoints usados:
+  - Por EAN: /api/catalog_system/pub/products/search?fq=alternateIds_Ean:{ean}
+  - Por texto: /api/catalog_system/pub/products/search?ft={query}
+
+Si la red falla, el retailer se reporta como no encontrado con el error.
+"""
+from __future__ import annotations
+
+import logging
+import re
+from typing import Optional
+
+import requests
+
+from config import Config, city_postal_code
+from services.matching import MatchCandidate
+from services.search_queries import merge_query_search
+from services.rounding import round_cop
+
+from .base import BaseScraper, RetailerResult
+
+logger = logging.getLogger(__name__)
+
+# VTEX rechaza queries con sufijos de peso (ej. "500g") con HTTP 400.
+_VTEX_WEIGHT_SUFFIX_RE = re.compile(r"\b\d+\s*(?:g|gr|kg|ml|l|lt|cc|und|un|u)\b", re.IGNORECASE)
+
+
+def _vtex_safe_query(description: str) -> str:
+    """Elimina sufijos de peso/volumen que disparan 400 en la API VTEX."""
+    cleaned = _VTEX_WEIGHT_SUFFIX_RE.sub(" ", description)
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    return cleaned or description.strip()
+
+
+class VtexScraper(BaseScraper):
+    """Scraper genérico para tiendas VTEX."""
+
+    def _session(self, postal_code: Optional[str] = None) -> requests.Session:
+        s = requests.Session()
+        s.headers.update({"User-Agent": Config.USER_AGENT, "Accept": "application/json"})
+        if postal_code:
+            self._apply_region(s, postal_code)
+        return s
+
+    def _apply_region(self, session: requests.Session, postal_code: str) -> None:
+        """
+        Regionaliza la sesión VTEX para que la tienda devuelva precio/
+        disponibilidad de la ciudad/zona correspondiente al código postal.
+
+        Mecanismo oficial de VTEX (Session Manager API): un POST a
+        /api/sessions con `public.postalCode` + `public.countryCode` fija las
+        cookies vtex_session / vtex_segment en la sesión, que se reenvían
+        automáticamente en las siguientes peticiones al mismo dominio. Si el
+        retailer NO tiene activa la función "Region" (regionalización por
+        seller/precio), esto no produce error: simplemente no habrá diferencia
+        de precio entre ciudades para ese retailer.
+        """
+        try:
+            url = f"{self.base_url}/api/sessions"
+            params = {"public.postalCode": postal_code, "public.countryCode": "COL"}
+            session.post(url, params=params, timeout=Config.SCRAPER_TIMEOUT)
+        except requests.RequestException as exc:
+            logger.debug(
+                "No se pudo regionalizar sesión VTEX (%s) para CP %s: %s", self.key, postal_code, exc
+            )
+
+    def _best_offer(self, product: dict) -> Optional[dict]:
+        """
+        Recorre items/sellers y devuelve la mejor oferta disponible.
+
+        Prioriza ofertas disponibles (IsAvailable) y, entre ellas, el menor
+        precio efectivo. Esto cubre el caso de múltiples sellers/presentaciones.
+        """
+        best = None
+        for item in product.get("items") or []:
+            for seller in item.get("sellers") or []:
+                offer = seller.get("commertialOffer") or {}
+                price = offer.get("Price")
+                if not price:
+                    continue
+                available = offer.get("IsAvailable", True)
+                key = (0 if available else 1, price)  # disponibles primero, luego menor precio
+                if best is None or key < best[0]:
+                    best = (key, offer)
+        return best[1] if best else None
+
+    @staticmethod
+    def _item_weight_meta(product: dict) -> tuple[Optional[str], Optional[float]]:
+        """Extrae unidad de medida y multiplicador (kg) del primer SKU VTEX."""
+        items = product.get("items") or []
+        if not items:
+            return None, None
+        item = items[0]
+        unit = item.get("measurementUnit")
+        mult = item.get("unitMultiplier")
+        try:
+            mult_f = float(mult) if mult is not None else None
+        except (TypeError, ValueError):
+            mult_f = None
+        return unit, mult_f
+
+    def _parse_product(self, product: dict) -> Optional[RetailerResult]:
+        """Convierte un producto VTEX en RetailerResult (mejor oferta disponible)."""
+        offer = self._best_offer(product)
+        if not offer:
+            return None
+        price = offer.get("Price")
+        list_price = offer.get("ListPrice") or offer.get("PriceWithoutDiscount")
+
+        promo_price = None
+        promo_desc = None
+        # Si hay descuento (ListPrice > Price) se modela como promoción.
+        if list_price and list_price > price:
+            promo_price = round_cop(price)
+            price_regular = round_cop(list_price)
+            teasers = offer.get("Teasers") or []
+            promo_desc = teasers[0].get("name") if teasers else "Precio con descuento"
+        else:
+            price_regular = round_cop(price)
+
+        measurement_unit, unit_multiplier = self._item_weight_meta(product)
+        is_weight_based = measurement_unit == "kg" and unit_multiplier and unit_multiplier > 0
+        price_per_kg = None
+        promo_price_per_kg = None
+        if is_weight_based:
+            price_per_kg = round_cop(price_regular / unit_multiplier)
+            if promo_price is not None:
+                promo_price_per_kg = round_cop(promo_price / unit_multiplier)
+
+        return RetailerResult(
+            retailer=self.key,
+            retailer_name=self.name,
+            found=True,
+            price=price_regular,
+            promo_price=promo_price,
+            promo_desc=promo_desc,
+            product_name=product.get("productName"),
+            url=product.get("link") or product.get("linkText"),
+            match_mode="ean",
+            measurement_unit=measurement_unit,
+            unit_multiplier=unit_multiplier,
+            is_weight_based=is_weight_based,
+            price_per_kg=price_per_kg,
+            promo_price_per_kg=promo_price_per_kg,
+        )
+
+    def _fetch_by_ean(self, ean: str, city: Optional[str] = None) -> Optional[RetailerResult]:
+        postal_code = city_postal_code(city)
+        url = f"{self.base_url}/api/catalog_system/pub/products/search"
+        params = {"fq": f"alternateIds_Ean:{ean}"}
+        resp = self._session(postal_code).get(url, params=params, timeout=Config.SCRAPER_TIMEOUT)
+        resp.raise_for_status()
+        data = resp.json()
+        if not data:
+            return RetailerResult(retailer=self.key, retailer_name=self.name, found=False, city=city)
+        result = self._parse_product(data[0])
+        if result:
+            result.city = city
+        return result
+
+    def _search_vtex_products(
+        self, description: str, city: Optional[str] = None
+    ) -> list[dict]:
+        """Ejecuta búsqueda VTEX probando variantes (tildes, plurales, una palabra)."""
+        postal_code = city_postal_code(city)
+        session = self._session(postal_code)
+        url = f"{self.base_url}/api/catalog_system/pub/products/search"
+
+        def search_one(query: str) -> list[dict]:
+            params = {"ft": query, "_from": 0, "_to": 23}
+            resp = session.get(url, params=params, timeout=Config.SCRAPER_TIMEOUT)
+            if resp.status_code == 400 or not resp.ok:
+                return []
+            return resp.json() or []
+
+        return merge_query_search(
+            description,
+            search_one,
+            dedupe_key=lambda p: str(p.get("productId") or p.get("productName") or ""),
+        )
+
+    def _fetch_candidates(
+        self, description: str, city: Optional[str] = None
+    ) -> list[tuple[MatchCandidate, RetailerResult]]:
+        data = self._search_vtex_products(description, city=city)
+        if not data:
+            return []
+        out: list[tuple[MatchCandidate, RetailerResult]] = []
+        for rank, product in enumerate(data):
+            result = self._parse_product(product)
+            if result and result.product_name:
+                result.found = False  # se marcará found tras homologar
+                result.city = city
+                out.append(
+                    (
+                        MatchCandidate(
+                            name=result.product_name,
+                            payload={"catalog_rank": rank},
+                        ),
+                        result,
+                    )
+                )
+        return out

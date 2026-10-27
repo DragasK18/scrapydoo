@@ -1,0 +1,24 @@
+# FastAPI Cloud needs fastapi[standard] (includes the `fastapi` CLI + uvicorn).
+fastapi[standard]>=0.115.0
+a2wsgi>=1.10.0
+
+flask
+flask-cors
+gunicorn
+playwright
+
+pandas	
+numpy
+openpyxl
+
+sqlalchemy
+
+rapidfuzz
+
+requests
+
+beautifulsoup4
+
+xlsxwriter
+
+python-dotenv

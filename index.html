@@ -1,12 +1,95 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="es-CO">
 <head>
-    <meta charset="utf-8">
-    <title>Cargando Scrapydoo...</title>
-    <!-- Redirige automáticamente a la carpeta de tu visor -->
-    <meta http-equiv="refresh" content="0; URL='./frontend/templates/'" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Scrapydoo / RecetApp — Compara precios</title>
+  <meta name="description" content="Compara precios de medicamentos entre farmacias de Colombia y encuentra la opción más barata por unidad con la misma sustancia.">
+  
+  <!-- RUTAS CORREGIDAS: Retroceden una carpeta para entrar a static -->
+  <link rel="stylesheet" href="../static/css/estilos.css">
+  <script type="module" src="../static/js/app.js"></script>
 </head>
 <body>
-    <p>Cargando aplicación... Si no te redirige, <a href="./frontend/templates/">haz clic aquí</a>.</p>
+  <header class="encabezado">
+    <h1 class="marca">Recet<span>App</span></h1>
+    <p class="lema">Compara el precio de tu medicamento entre farmacias de Colombia y encuentra la mejor opción.</p>
+    <p class="fecha-datos" id="fecha-datos">Cargando precios…</p>
+    <!-- Panel de Estadísticas (KPIs interactivos por cadena) -->
+    <div id="kpi-panel" class="kpi-panel" role="group" aria-label="Filtrar por farmacia"></div>
+  </header>
+
+  <form class="buscador" role="search" id="buscador">
+    <label for="consulta">Busca por nombre, marca, código o principio activo</label>
+    <div class="buscador-fila">
+      <input id="consulta" name="q" type="search" autocomplete="off" spellcheck="false"
+             placeholder="Ej.: losartán, Dolex, atorvastatina 20" disabled>
+      <button type="button" id="limpiar-todo" class="btn-secundario" hidden>Limpiar filtros</button>
+    </div>
+
+    <!-- Barra de filtros avanzados -->
+    <div class="filtros-grid" id="filtros-panel">
+      <div class="filtro-campo">
+        <label for="filtro-principio">Categoría / Principio activo</label>
+        <select id="filtro-principio" disabled>
+          <option value="">Todas las categorías</option>
+        </select>
+      </div>
+
+      <div class="filtro-campo">
+        <label for="filtro-marca">Marca / Laboratorio</label>
+        <select id="filtro-marca" disabled>
+          <option value="">Todas las marcas</option>
+        </select>
+      </div>
+
+      <div class="filtro-campo">
+        <label for="filtro-orden">Ordenar por</label>
+        <select id="filtro-orden" disabled>
+          <option value="unidad_asc">Precio por unidad: menor a mayor</option>
+          <option value="precio_asc">Precio total: menor a mayor</option>
+          <option value="precio_desc">Precio total: mayor a menor</option>
+          <option value="descuento_desc">Mayor descuento</option>
+        </select>
+      </div>
+
+      <div class="filtro-campo filtro-acciones">
+        <label class="check-equivalentes">
+          <input type="checkbox" id="incluir-equivalentes" checked disabled>
+          <span>Incluir equivalentes del mismo principio</span>
+        </label>
+        <div class="vista-toggle" role="group" aria-label="Cambiar vista">
+          <button type="button" id="vista-cuadricula" class="btn-vista activo" title="Vista en cuadrícula">Cuadrícula</button>
+          <button type="button" id="vista-lista" class="btn-vista" title="Vista en lista compacta">Lista</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <main id="contenido">
+    <p class="estado" id="estado" aria-live="polite"></p>
+    <div id="inicio" class="inicio" hidden>
+      <p>Escribe al menos 2 letras o selecciona una farmacia, categoría o marca arriba. Prueba con:</p>
+      <ul class="ejemplos">
+        <li><button type="button" data-ejemplo="losartan">losartán</button></li>
+        <li><button type="button" data-ejemplo="Dolex">Dolex</button></li>
+        <li><button type="button" data-ejemplo="atorvastatina 20">atorvastatina 20</button></li>
+        <li><button type="button" data-ejemplo="Viagra">Viagra</button></li>
+      </ul>
+    </div>
+    <div id="resultados"></div>
+  </main>
+
+  <aside class="panel" id="panel" aria-labelledby="panel-titulo" hidden>
+    <div class="panel-cabecera">
+      <h2 id="panel-titulo" tabindex="-1">Misma sustancia, más barato</h2>
+      <button type="button" class="cerrar" id="cerrar-panel" aria-label="Cerrar">✕</button>
+    </div>
+    <div id="panel-contenido"></div>
+  </aside>
+
+  <footer class="aviso" role="note">
+    <p>RecetApp compara precios; no reemplaza la indicación de tu médico o farmacéutico</p>
+  </footer>
 </body>
 </html>

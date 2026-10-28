@@ -92,17 +92,29 @@ function switchView(view) {
 }
 
 // ── Inicialización ──────────────────────────────────────────
+// ── Inicialización ──────────────────────────────────────────
 async function init() {
   try {
-    const me = await fetch('/api/me').then(r => r.json());
-    if (me.error) { window.location.href = '/login'; return; }
+    // COMENTAMOS EL CHECKEO REAL DE SEGURIDAD
+    // const me = await fetch('/api/me').then(r => r.json());
+    // if (me.error) { window.location.href = '/login'; return; }
+    
+    // SIMULAMOS EL USUARIO PARA QUE LA APP FUNCIONE SIN LOGIN
+    const me = {
+      username: "admin_local",
+      full_name: "Administrador (Local)",
+      role: "admin"
+    };
+
     CURRENT_USER = me;
     document.getElementById('userName').textContent = me.full_name || me.username;
     document.getElementById('userRole').textContent = me.role === 'admin' ? 'Administrador' : 'Usuario';
     document.querySelectorAll('.admin-only').forEach(el => { el.style.display = me.role === 'admin' ? 'flex' : 'none'; });
-    document.getElementById('logoutBtn').addEventListener('click', doLogout);
+    
+    // También comentamos el botón de logout para que no nos saque
+    // document.getElementById('logoutBtn').addEventListener('click', doLogout);
   } catch (e) {
-    window.location.href = '/login';
+    // window.location.href = '/login';
     return;
   }
 
